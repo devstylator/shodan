@@ -1,0 +1,86 @@
+_schema-version: "3.2"
+ID: shodan
+version: 0.0.1
+modules:
+- name: shodan-destination-content
+  type: com.sap.application.content
+  requires:
+  - name: uaa_shodan
+    parameters:
+      service-key:
+        name: uaa_shodan-key
+  - name: shodan_html_repo_host
+    parameters:
+      service-key:
+        name: shodan_html_repo_host-key
+  - name: shodan-destination-service
+    parameters:
+      content-target: true
+  parameters:
+    content:
+      subaccount:
+        destinations:
+        - Name: shodanService_shodan_html_repo_host
+          ServiceInstanceName: shodan-html5-app-host-service
+          ServiceKeyName: shodan_html_repo_host-key
+          sap.cloud.service: shodanService
+        - Authentication: OAuth2UserTokenExchange
+          Name: shodanService_uaa_shodan
+          ServiceInstanceName: shodan-xsuaa-service
+          ServiceKeyName: uaa_shodan-key
+          sap.cloud.service: shodanService
+        existing_destinations_policy: update
+  build-parameters:
+    no-source: true
+- name: shodan_ui_deployer
+  type: com.sap.application.content
+  path: .
+  requires:
+  - name: shodan_html_repo_host
+    parameters:
+      content-target: true
+  build-parameters:
+    build-result: resources
+    requires:
+    - artifacts:
+      - shodanModule-content.zip
+      name: shodanModule
+      target-path: resources/
+- name: shodanModule
+  type: html5
+  path: webapp
+  build-parameters:
+    builder: custom
+    commands:
+    - npm run build
+    supported-platforms: []
+resources:
+- name: shodan-destination-service
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: destination
+    service-name: shodan-destination-service
+    service-plan: lite
+- name: shodan_html_repo_host
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: html5-apps-repo
+    service-name: shodan-html5-app-host-service
+    service-plan: app-host
+- name: uaa_shodan
+  type: org.cloudfoundry.managed-service
+  parameters:
+    path: ./xs-security.json
+    service: xsuaa
+    service-name: shodan-xsuaa-service
+    service-plan: application
+- name: cpi_gpt
+  type: org.cloudfoundry.managed-service
+  parameters:
+    service: destination
+    service-plan: lite
+build-parameters:
+  before-all:
+  - builder: custom
+    commands:
+    - npm install

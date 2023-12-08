@@ -1,0 +1,78 @@
+<core:FragmentDefinition
+    xmlns="sap.m"
+    xmlns:f="sap.f"
+    xmlns:core="sap.ui.core"
+    xmlns:l="sap.ui.layout"
+>
+    <Popover
+        id="myPopover"
+        title="TriOptimum Corporation Fiori Chat assistant"
+        class="sapUiResponsivePadding--header sapUiResponsivePadding--footer"
+        verticalScrolling="true"
+        modal="false"
+        contentMinWidth="550px"
+        contentHeight="600px"
+        showHeader="true"
+    >
+        <content>
+            <VBox
+                id="Vbox1"
+                class="sapUiSmallMargin"
+            >
+                <NotificationList
+                    id="NotificationList1"
+                    items="{ path: 'chat>/messages'}"
+                >
+                    <layoutData>
+                        <FlexItemData
+                            id="a2"
+                            maxWidth="600px"
+                        />
+                    </layoutData>
+                    <NotificationListItem
+                        id="NotifListItm"
+                        title="{chat>content}"
+                        showCloseButton="false"
+                        unread="false"
+                        truncate="false"
+                        close=".onItemClose"
+                        press=".onListItemPress"
+                        authorName="{= ${chat>role} === 'assistant' ? 'Chat GPT' : ${userModel>/user/FirstName} }"
+                        authorPicture="{= ${chat>role} === 'assistant' ? ${resourceModel>/img} : '' }"	
+                        authorInitials="{= ${chat>role} === 'assistant' ? '' : ${userModel>/user/Initials} }"
+                    />
+                </NotificationList>    
+            </VBox>
+        </content>
+        <footer>
+            <l:VerticalLayout
+                id="l1"
+                class="sapUiContentPadding"
+                width="100%"
+            >
+                <TextArea
+                    id="TextArea1"
+                    width="100%"
+                    placeholder="Enter message to a bot"
+                    change=".handleChange"
+                    showExceededText="true"
+                    rows="4"
+                    ariaLabelledBy="TextAreaLabel"
+                />
+                <Toolbar id="tol1">
+                    <ToolbarSpacer id="ts" />
+                    <Button
+                        id="closeButton"
+                        text="Close"
+                        press=".handleActionClose"
+                    />
+                    <Button
+                        id="sendButton"
+                        text="Send"
+                        press=".handleActionSend"
+                    />
+                </Toolbar>
+            </l:VerticalLayout>
+        </footer>
+    </Popover>
+</core:FragmentDefinition>
